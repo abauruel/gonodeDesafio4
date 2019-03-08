@@ -9,13 +9,13 @@ class UserController {
   }
 
   async update ({ request, auth }) {
-    const { email, password, username, password_new } = request.all()
+    const { email, password, username, passwordnew } = request.all()
     await auth.attempt(email, password)
 
     const user = await User.findByOrFail('email', email)
 
     user.username = username
-    user.password = password_new
+    user.password = passwordnew
     await user.save()
 
     return user
