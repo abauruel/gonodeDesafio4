@@ -11,9 +11,10 @@ class EventoController {
     return evento
   }
 
-  async store ({ request, response }) {
-    const data = request.only(['title', 'localizacao', 'data', 'user_id'])
-    const evento = await Evento.create(data)
+  async store ({ request, response, auth }) {
+    const data = request.only(['title', 'localizacao', 'data'])
+
+    const evento = await Evento.create({ ...data, user_id: auth.user.id })
 
     return evento
   }
