@@ -2,17 +2,25 @@
 const Evento = use('App/Models/Evento')
 const Moment = require('moment')
 class EventoController {
-  async index ({ request, response, view, params }) {
+  async index ({ request, response, view, params, auth }) {
     const evento = await Evento.query()
-      .where('user_id', params.id)
+      .where('user_id', auth.user.id)
       .with('users')
       .fetch()
 
+    console.log(Date.now())
     return evento
   }
 
-  async store ({ request, response, auth }) {
+  async store ({ request, auth }) {
     const data = request.only(['title', 'localizacao', 'data'])
+    if (
+      !(await Evento.query()
+        .where('data', data.data)
+        .where(user_id, auth.user.id))
+    ) {
+      return 'ja existe evento cadastrado para esta data'
+    }
 
     const evento = await Evento.create({ ...data, user_id: auth.user.id })
 
@@ -21,7 +29,18 @@ class EventoController {
 
   async show ({ params, request, response, view }) {
     const eventos = await Evento.findOrFail(params.id)
-    await eventos.load('user')
+    await eventos.load('users')
+    return eventos
+  }
+
+  async showPeriod ({ request, auth }) {
+    const data = request.only(['dataInicial', 'dataFim'])
+    console.log(data)
+    const eventos = Evento.query()
+      .whereBetween('data', [data.dataInicial, data.dataFim])
+      .where('user_id', auth.user.id)
+      .with('users')
+      .fetch()
     return eventos
   }
 

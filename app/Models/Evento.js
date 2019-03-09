@@ -4,7 +4,7 @@
 const Model = use('Model')
 
 class Evento extends Model {
-  user () {
+  users () {
     return this.belongsTo('App/Models/User')
   }
 }
